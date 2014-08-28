@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 public class Coordinate {
 	private static final String COORDINATE_REGEX = 
-		"\\((\\d+),(\\d+)\\)";
+		"\\((-?\\d+),(-?\\d+)\\)";
 
 	public static Coordinate[] NEIGHBOURS = {
 		new Coordinate(-1,-1),

@@ -1,65 +1,10 @@
 package com.unseen.life;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 class Population {
 
-	private class Row extends HashSet<Integer> {
-		/**
-		 * Serial Version UID
-		 */
-		private static final long serialVersionUID = -8083725112470121454L;
-	}
-
-	private class Culture extends HashMap<Integer,Row> {
-		/**
-		 * Serial Version UID
-		 */
-		private static final long serialVersionUID = 2666707086643176537L;
-
-		private int mMinX = Integer.MAX_VALUE;
-		private int mMinY = Integer.MAX_VALUE;
-		
-		public void add(
-			final Coordinate i_coordinate)
-		{
-			Row row;
-			if (containsKey(i_coordinate.y)) {
-				row = get(i_coordinate.y);
-			} else {
-				row = new Row();
-				put(i_coordinate.y, row);
-			}
-			row.add(i_coordinate.x);
-			if (i_coordinate.x < mMinX) {
-				mMinX = i_coordinate.y;
-			}
-			if (i_coordinate.y < mMinY) {
-				mMinY = i_coordinate.y;
-			}
-			
-		}
-
-		public boolean hasCellAt(
-			final Coordinate i_pos)
-		{
-			Row row = get(i_pos.y);
-			return ((null != row) &&
-				    (row.contains(i_pos.x)));
-		}
-		
-		public int getMinX() {
-			return mMinX;
-		}
-		
-		public int getMinY() {
-			return mMinY;
-		}
-	}
-	
 	private Culture mCulture = new Culture();
 
 	public Population(
@@ -100,22 +45,37 @@ class Population {
 		final Culture newCulture = new Culture();
 		for (Map.Entry<Integer,Row> entry : mCulture.entrySet()) {
 			for (Integer x : entry.getValue()) {
-				final Coordinate cellPos = new Coordinate(x, entry.getKey());
-				if (shouldHaveCell(cellPos)) {
-					newCulture.add(cellPos);
-				}
-				for (Coordinate neighbour : Coordinate.NEIGHBOURS) {
-					final Coordinate pos = neighbour.add(cellPos);
-					if (shouldHaveCell(pos)) {
-						newCulture.add(pos);
-					}
-				}
+				final Coordinate cellPos = 
+						addCellIfStillAlive(newCulture, entry, x);
+				addNewbornCells(newCulture, cellPos);
 			}
 		}
 		mCulture = newCulture;
 	}
+
+	private Coordinate addCellIfStillAlive(final Culture newCulture,
+			final Map.Entry<Integer, Row> i_entry, 
+			final Integer i_x) 
+	{
+		final Coordinate cellPos = new Coordinate(i_x, i_entry.getKey());
+		if (shouldHaveCell(cellPos)) {
+			newCulture.add(cellPos);
+		}
+		return cellPos;
+	}
+
+	private void addNewbornCells(final Culture newCulture,
+			final Coordinate cellPos) {
+		for (Coordinate neighbour : Coordinate.NEIGHBOURS) {
+			final Coordinate pos = neighbour.add(cellPos);
+			if (shouldHaveCell(pos)) {
+				newCulture.add(pos);
+			}
+		}
+	}
 	
 	public void dump() {
+		System.out.println("--------------");
 		int lastY = mCulture.getMinY();
 		for (Map.Entry<Integer,Row> entry : mCulture.entrySet()) {
 			final int yPos = entry.getKey() - lastY;
@@ -131,6 +91,7 @@ class Population {
 					System.out.print(" ");
 				}
 				System.out.print("*");
+				lastX++;
 			}
 		}
 		System.out.println();

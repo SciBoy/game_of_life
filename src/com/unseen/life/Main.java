@@ -10,8 +10,10 @@ public class Main {
 			System.exit(0);
 		}
 		Population population = new Population(argv[0]);
-		population.dump();
-		population.advance();
-		population.dump();
+		for (int i = 0; i < 10; i++) {
+			System.out.println("Population " + Integer.toString(i));
+			population.dump();
+			population.advance();
+		}
 	}
 }
