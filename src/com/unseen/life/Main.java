@@ -10,10 +10,23 @@ public class Main {
 			System.exit(0);
 		}
 		Population population = new Population(argv[0]);
-		for (int i = 0; i < 10; i++) {
-			System.out.println("Population " + Integer.toString(i));
-			population.dump();
+		DisplayPopulation display = new DisplayPopulation(population);
+		display.start();
+		display.centerPopulation();
+		for (int i = 0; i < 50; i++) {
+			display.draw();
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			final long startTime = System.nanoTime();
 			population.advance();
+			final long diff = System.nanoTime() - startTime;
+			display.drawCalculationTime(diff);
+			display.refresh();
 		}
+		display.stop();
 	}
 }

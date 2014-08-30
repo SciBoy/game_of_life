@@ -10,6 +10,8 @@ public class Culture extends TreeMap<Integer,Row> {
 
 	private int mMinX = Integer.MAX_VALUE;
 	private int mMinY = Integer.MAX_VALUE;
+	private long mSumX = 0;
+	private long mSumY = 0;
 	
 	public void add(
 		final Coordinate i_coordinate)
@@ -21,7 +23,11 @@ public class Culture extends TreeMap<Integer,Row> {
 			row = new Row();
 			put(i_coordinate.y, row);
 		}
-		row.add(i_coordinate.x);
+		if (!row.contains(i_coordinate.x)) {
+			row.add(i_coordinate.x);
+			mSumX += i_coordinate.x;
+			mSumY += i_coordinate.y;
+		}
 		if (i_coordinate.x < mMinX) {
 			mMinX = i_coordinate.x;
 		}
@@ -45,5 +51,13 @@ public class Culture extends TreeMap<Integer,Row> {
 	
 	public int getMinY() {
 		return mMinY;
+	}
+	
+	public int getCenterX() {
+		return (int)(mSumX / size());
+	}
+	
+	public int getCenterY() {
+		return (int)(mSumY / size());
 	}
 }

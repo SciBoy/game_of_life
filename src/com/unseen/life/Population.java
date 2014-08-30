@@ -1,11 +1,13 @@
 package com.unseen.life;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 class Population {
 
 	private Culture mCulture = new Culture();
+	private int mGeneration = 0;
 
 	public Population(
 		final String i_initialPopulation) 
@@ -51,6 +53,7 @@ class Population {
 			}
 		}
 		mCulture = newCulture;
+		mGeneration++;
 	}
 
 	private Coordinate addCellIfStillAlive(final Culture newCulture,
@@ -65,7 +68,8 @@ class Population {
 	}
 
 	private void addNewbornCells(final Culture newCulture,
-			final Coordinate cellPos) {
+			final Coordinate cellPos) 
+	{
 		for (Coordinate neighbour : Coordinate.NEIGHBOURS) {
 			final Coordinate pos = neighbour.add(cellPos);
 			if (shouldHaveCell(pos)) {
@@ -74,8 +78,28 @@ class Population {
 		}
 	}
 	
+	public int getGeneration() {
+		return mGeneration;
+	}
+	
+	public List<Coordinate> getCellsWithin(
+			final int iStartX,
+			final int iStartY,
+			final int iEndX,
+			final int iEndY) 
+	{
+		final List<Coordinate> cells = new ArrayList<Coordinate>();
+		for (Map.Entry<Integer,Row> entry : mCulture.subMap(iStartY, iEndY).entrySet()) {
+			final int y = entry.getKey();
+			for (int x : entry.getValue().subSet(iStartX, iEndX)) {
+				cells.add(new Coordinate(x,y));
+			}
+		}
+		return cells;
+	}
+	
 	public void dump() {
-		System.out.println("--------------");
+		System.out.println("--Generation " + Integer.toString(mGeneration) + "--");
 		int lastY = mCulture.getMinY();
 		for (Map.Entry<Integer,Row> entry : mCulture.entrySet()) {
 			final int yPos = entry.getKey() - lastY;
@@ -95,5 +119,13 @@ class Population {
 			}
 		}
 		System.out.println();
+	}
+	
+	public int getCenterX() {
+		return mCulture.getCenterX();
+	}
+	
+	public int getCenterY() {
+		return mCulture.getCenterY();
 	}
 }
